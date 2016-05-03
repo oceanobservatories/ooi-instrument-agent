@@ -1,0 +1,3 @@
+[submodule "ooi_instrument_agent/agent-web"]
+	path = ooi_instrument_agent/agent-web
+	url = https://github.com/oceanobservatories/agent-web
