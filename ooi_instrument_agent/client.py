@@ -66,12 +66,6 @@ class ZmqDriverClient(object):
         return self._command('process_echo', *args, **kwargs)
 
     def execute(self, command, *args, **kwargs):
-        # remap direct access EXECUTE to the specific command in the InstrumentDriver
-        # to ensure this is processed in both the Driver and the Protocol
-        if command == 'DRIVER_EVENT_START_DIRECT':
-            return self._command('start_direct', *args, **kwargs)
-        elif command == 'DRIVER_EVENT_STOP_DIRECT':
-            return self._command('stop_direct', *args, **kwargs)
         return self._command('execute_resource', command, *args, **kwargs)
 
     def init_params(self, *args, **kwargs):
