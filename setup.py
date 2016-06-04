@@ -10,5 +10,5 @@ setup(
     install_requires=['Flask>=0.10',
                       'gevent>=1.1',
                       'pyzmq>=15.0',
-                      'python-consul>=0.6']
+                      'python-consul>=0.6', 'twisted']
 )
