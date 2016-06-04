@@ -1,12 +1,14 @@
 import json
 import logging
 import os
+import socket
 from functools import wraps
 
 from consul import Consul
 from flask import jsonify, request, Blueprint, send_file, safe_join, Response
 
 from ooi_instrument_agent.client import TimeoutException
+from ooi_instrument_agent.common import get_sniffer_socket
 from ooi_instrument_agent.lock import LockManager, Locked
 from ooi_instrument_agent.utils import list_drivers, get_client, get_port_agent, get_from_request, get_timeout
 
@@ -16,6 +18,7 @@ page.lock_manager = None
 page.consul = None
 
 log = logging.getLogger(__name__)
+sniff_sockfile = get_sniffer_socket()
 
 
 def lockout(func):
@@ -132,7 +135,7 @@ def get_lock(driver_id):
 
 @page.route('/api/<driver_id>/lock', methods=['POST'])
 def set_lock(driver_id):
-    key = request.form.get('key')
+    key = get_from_request('key')
     page.lock_manager[driver_id] = key
     return jsonify({'locked-by': page.lock_manager[driver_id]})
 
@@ -142,6 +145,14 @@ def set_lock(driver_id):
 def unlock(driver_id):
     del page.lock_manager[driver_id]
     return jsonify({'locked-by': page.lock_manager[driver_id]})
+
+
+@page.route('/api/<driver_id>/sniff')
+def sniff(driver_id):
+    key = get_from_request('key')
+    command = json.dumps([driver_id, key])
+    data = get_sniff_data(command)
+    return data
 
 
 @page.route('/api/locks')
@@ -171,3 +182,20 @@ def js(jsfile):
 def partials(pfile):
     source_dir = 'agent-web/app/partials'
     return send_file(safe_join(source_dir, pfile))
+
+
+def get_sniff_data(command):
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.settimeout(5.0)
+    sock.connect(sniff_sockfile)
+    sock.send(command)
+    data = ''
+    while True:
+        chunk = sock.recv(4096)
+        if chunk:
+            data += chunk
+        else:
+            break
+
+    sock.close()
+    return data
