@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='OOI Instrument Agent',
-    version='0.0.3',
+    version='0.0.4',
     long_description=__doc__,
     packages=['ooi_instrument_agent'],
     include_package_data=True,

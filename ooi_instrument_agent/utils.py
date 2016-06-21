@@ -5,7 +5,7 @@ from flask import request
 from werkzeug.exceptions import abort
 
 from ooi_instrument_agent.client import ZmqDriverClient
-
+from ooi_instrument_agent.common import stopwatch
 
 DEFAULT_TIMEOUT = 90000
 log = logging.getLogger(__name__)
