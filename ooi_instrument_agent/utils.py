@@ -6,7 +6,6 @@ from werkzeug.exceptions import abort
 
 from ooi_instrument_agent.client import ZmqDriverClient
 
-
 DEFAULT_TIMEOUT = 90000
 log = logging.getLogger(__name__)
 
